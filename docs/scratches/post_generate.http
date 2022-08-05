@@ -1,0 +1,6 @@
+POST http://symfony.localhost/generate
+Content-Type: application/json
+
+{
+   "discount": 5
+}
