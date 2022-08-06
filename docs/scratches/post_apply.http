@@ -5,20 +5,28 @@ Content-Type: application/json
    "items": [
        {
            "id": 1,
-           "price": 399
+           "price": 5
        },
        {
            "id": 2,
-           "price": 600
+           "price": 5
        },
      {
        "id": 3,
-         "price": 600
+         "price": 5
      },
        {
            "id": 4,
-           "price": 1000
+           "price": 5
+       },
+       {
+           "id": 5,
+           "price": 5
+       },
+       {
+           "id": 6,
+           "price": 5
        }
    ],
-   "code": "UNDOKZI"
+   "code": "JCSISCH"
 }

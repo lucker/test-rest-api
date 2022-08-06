@@ -90,19 +90,21 @@ class ApiController extends AbstractController
 
         for ($i = 0; $i < count($items); $i++) {
             $item = $items[$i];
-            $roundedDiscount = floor($voucher->getDiscount() * ($item['price'] / $sum));
-            $priceWithDiscount = $item['price'] - $roundedDiscount;
-            $totalDiscount += $roundedDiscount;
+            $priceWithDiscount = $item['price'];
 
-            if ($totalDiscount < $voucher->getDiscount()
-                && count($items) - 1 == $i
-            ) {
-                $roundedDiscount = $roundedDiscount + ($voucher->getDiscount() - $totalDiscount);
+            if ($totalDiscount != $voucher->getDiscount()) {
+                $roundedDiscount = round($voucher->getDiscount() * ($item['price'] / $sum));
+
+                if ($totalDiscount + $roundedDiscount >= $voucher->getDiscount()) {
+                    $roundedDiscount = $voucher->getDiscount() - $totalDiscount;
+                }
+
                 $priceWithDiscount = $item['price'] - $roundedDiscount;
-            }
 
-            if ($priceWithDiscount < 0) {
-                $priceWithDiscount = 0;
+                if ($priceWithDiscount < 0) {
+                    $priceWithDiscount = 0;
+                }
+                $totalDiscount += $roundedDiscount;
             }
 
             $response['items'][] = [
@@ -110,6 +112,22 @@ class ApiController extends AbstractController
                 'price' => $item['price'],
                 'price_with_discount' => $priceWithDiscount
             ];
+        }
+
+        //докидываем скидку если осталась
+        if ($totalDiscount < $voucher->getDiscount()) {
+            $leftDiscount = $voucher->getDiscount() - $totalDiscount;
+            foreach ($response['items'] as &$item) {
+                $canAdd = $item['price'] - $item['price_with_discount'];
+
+                if ($leftDiscount - $canAdd >=0) {
+                    $item['price_with_discount'] = 0;
+                    $totalDiscount += $canAdd;
+                } else {
+                    $item['price_with_discount'] =  $item['price_with_discount'] - $leftDiscount;
+                    break;
+                }
+            }
         }
 
         return $response;
